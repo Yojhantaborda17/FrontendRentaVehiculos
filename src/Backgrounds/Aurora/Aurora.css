@@ -1,0 +1,51 @@
+/* Reset global - elimina márgenes y espacios */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* html y body ocupan 100% sin espacios */
+html, body {
+  height: 100%;
+  width: 100%;
+  background-color: #000 !important;
+  overflow: hidden; /* evita scrollbars */
+}
+
+/* root ocupa todo sin dejar espacios */
+#root {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* contenedor full-screen de aurora */
+.aurora-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: transparent;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* canvas ocupa exactamente el contenedor */
+.aurora-container canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: high-quality;
+}
+
+/* contenido de la app */
+.app-content {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+}
