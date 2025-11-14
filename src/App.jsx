@@ -12,17 +12,18 @@ function App() {
 
   return (
     <>
-      
-      <Aurora colorStops={['#0A0A14', '#3A29FF', '#2614f1']} blend={0.15} amplitude={0.5} speed={1.2} />
+
+      <Aurora colorStops={['#0A0A14', '#3A29FF', '#2614f1']} blend={0.1} amplitude={0.5} speed={1.2} />
       <div style={{
         position: 'fixed',
         top: 0,
         right: 0,
-        height: '100vh',
-        zIndex: 10,
-        pointerEvents: 'auto'
+        zIndex: 10000,
+        pointerEvents: 'auto',
+        display: 'flex',
+        width: '60%',
+
       }}>
-      </div>
         <div className='d-flex vh-100 justify-content-center align-items-center flex-column text-white'>
           <h1>
             Bienvenido al panel de gestión de RVA
@@ -31,8 +32,8 @@ function App() {
             Autores: <b>Edidson Girón Franco</b> y <b>Yojhan Andrés Taborda</b>
           </p>
         </div>
-      
-      
+      </div>
+
     </>
   )
 }

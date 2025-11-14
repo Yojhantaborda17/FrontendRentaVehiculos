@@ -76,7 +76,7 @@ export default function Vehiculos() {
             swal.fire({
                 icon: 'success',
                 title: 'Vehículo guardado con éxito'
-            })        
+            })
 
         } catch (err) {
             setShowCarsModal(false);

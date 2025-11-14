@@ -33,9 +33,9 @@ export default function Sidebar() {
       label: 'Clientes',
     },
     {
-      path: '/dashboard/renta',
+      path: '/dashboard/alquileres',
       icon: 'bi-box-seam',
-      label: 'Renta'
+      label: 'Alquileres',
     }
   ];
 
@@ -43,7 +43,7 @@ export default function Sidebar() {
     <div className="dashboard-container">
       {/* Mobile Header */}
       <div className="mobile-header">
-        <button 
+        <button
           className="btn btn-link text-dark mobile-toggle"
           onClick={toggleSidebar}
           aria-label="Toggle menu"
@@ -51,7 +51,7 @@ export default function Sidebar() {
           <i className="bi bi-list fs-3"></i>
         </button>
         <div className="d-flex align-items-center">
-          <div 
+          <div
             className="bg-primary rounded-3 d-flex align-items-center justify-content-center me-2"
             style={{ width: '36px', height: '36px' }}
           >
@@ -69,7 +69,7 @@ export default function Sidebar() {
         {/* Logo Section */}
         <div className="sidebar-header">
           <div className="d-flex align-items-center">
-            <div 
+            <div
               className="bg-primary rounded-3 d-flex align-items-center justify-content-center me-3"
               style={{ width: '48px', height: '48px' }}
             >
@@ -79,8 +79,8 @@ export default function Sidebar() {
               <h4 className="text-white fw-bold mb-0">RVA</h4>
             </div>
           </div>
-          
-          <button 
+
+          <button
             className="btn btn-link text-white d-lg-none p-0"
             onClick={toggleSidebar}
             aria-label="Close menu"
@@ -117,7 +117,7 @@ export default function Sidebar() {
         {/* User Section */}
         <div className="sidebar-footer">
           <div className="d-flex align-items-center mb-3 px-2">
-            <div 
+            <div
               className="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0"
               style={{ width: '40px', height: '40px' }}
             >
@@ -130,7 +130,7 @@ export default function Sidebar() {
               </small>
             </div>
           </div>
-          <button 
+          <button
             onClick={handleLogout}
             className="btn btn-outline-light btn-sm w-100 d-flex align-items-center justify-content-center"
           >
