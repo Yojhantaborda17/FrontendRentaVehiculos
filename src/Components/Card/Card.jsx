@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Card.css';
 
-const Card = ({ emoji, title, children, onActualizar, openByDefault = false }) => {
+const Card = ({ emoji, title, children, onActualizar, buttonName, openByDefault = false }) => {
     const [showCard, setShowCard] = useState(openByDefault);
 
     const handleClick = () => setShowCard(!showCard);
@@ -34,12 +34,12 @@ const Card = ({ emoji, title, children, onActualizar, openByDefault = false }) =
                             {children}
                         </div>
 
-                        <div className="d-flex flex-column gap-2">
+                        <div className="">
                             <button
                                 onClick={handleActualizar}
-                                className="btn btn-outline-info text-white fw-bold"
+                                className="btn mb-3 btn-outline-info text-white fw-bold"
                             >
-                                Actualizar
+                                {buttonName}
                             </button>
                         </div>
                     </div>

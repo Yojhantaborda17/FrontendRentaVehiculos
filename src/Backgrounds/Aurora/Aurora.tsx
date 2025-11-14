@@ -135,42 +135,60 @@ export default function Aurora(props: AuroraProps) {
     const renderer = new Renderer({
       alpha: true,
       premultipliedAlpha: true,
-      antialias: true
+      antialias: false // cambiar a false reduce carga GPU
     });
+
     const gl = renderer.gl;
     gl.clearColor(0, 0, 0, 0);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-    gl.canvas.style.backgroundColor = 'transparent';
+    
+    const canvas = gl.canvas;
+    canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;background:transparent';
 
     let program: Program | undefined;
+    let rafId = 0;
+    let lastTime = 0;
+    const targetFPS = 30; // limitar a 30fps en lugar de 60
+    const frameInterval = 1000 / targetFPS;
 
-    function resize() {
+    // Cache para conversión de colores
+    const colorCache = new Map<string, number[]>();
+    const parseColor = (hex: string) => {
+      if (!colorCache.has(hex)) {
+        const c = new Color(hex);
+        colorCache.set(hex, [c.r, c.g, c.b]);
+      }
+      return colorCache.get(hex)!;
+    };
+
+    function resizeCanvas() {
       if (!ctn) return;
       const width = ctn.offsetWidth;
       const height = ctn.offsetHeight;
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2); // limitar dpr a 2 máximo
 
-      // Importante: OGL necesita la resolución física
-      renderer.setSize(width * dpr, height * dpr);
-      gl.canvas.style.width = width + 'px';
-      gl.canvas.style.height = height + 'px';
+      const w = width * dpr;
+      const h = height * dpr;
+
+      renderer.setSize(w, h);
+      canvas.width = w;
+      canvas.height = h;
 
       if (program) {
         program.uniforms.uResolution.value = [width, height];
       }
     }
-    window.addEventListener('resize', resize);
+
+    const observer = new ResizeObserver(resizeCanvas);
+    observer.observe(ctn);
 
     const geometry = new Triangle(gl);
     if (geometry.attributes.uv) {
       delete geometry.attributes.uv;
     }
 
-    const colorStopsArray = colorStops.map(hex => {
-      const c = new Color(hex);
-      return [c.r, c.g, c.b];
-    });
+    const colorStopsArray = colorStops.map(parseColor);
 
     program = new Program(gl, {
       vertex: VERT,
@@ -185,37 +203,42 @@ export default function Aurora(props: AuroraProps) {
     });
 
     const mesh = new Mesh(gl, { geometry, program });
-    ctn.appendChild(gl.canvas);
+    ctn.appendChild(canvas);
 
-    let animateId = 0;
     const update = (t: number) => {
-      animateId = requestAnimationFrame(update);
+      rafId = requestAnimationFrame(update);
+      
+      // Throttle a targetFPS
+      const elapsed = t - lastTime;
+      if (elapsed < frameInterval) return;
+      lastTime = t - (elapsed % frameInterval);
+
       const { time = t * 0.01, speed = 1.0 } = propsRef.current;
       if (program) {
         program.uniforms.uTime.value = time * speed * 0.1;
         program.uniforms.uAmplitude.value = propsRef.current.amplitude ?? 1.0;
         program.uniforms.uBlend.value = propsRef.current.blend ?? blend;
+        
         const stops = propsRef.current.colorStops ?? colorStops;
-        program.uniforms.uColorStops.value = stops.map((hex: string) => {
-          const c = new Color(hex);
-          return [c.r, c.g, c.b];
-        });
+        program.uniforms.uColorStops.value = stops.map(parseColor);
+        
         renderer.render({ scene: mesh });
       }
     };
-    animateId = requestAnimationFrame(update);
-
-    resize();
+    
+    rafId = requestAnimationFrame(update);
+    resizeCanvas();
 
     return () => {
-      cancelAnimationFrame(animateId);
-      window.removeEventListener('resize', resize);
-      if (ctn && gl.canvas.parentNode === ctn) {
-        ctn.removeChild(gl.canvas);
+      cancelAnimationFrame(rafId);
+      observer.disconnect();
+      if (ctn && canvas.parentNode === ctn) {
+        ctn.removeChild(canvas);
       }
       gl.getExtension('WEBGL_lose_context')?.loseContext();
+      colorCache.clear();
     };
-  }, [amplitude]);
+  }, [amplitude, blend, colorStops]); // agregar dependencias para reiniciar solo cuando cambien
 
   return <div ref={ctnDom} className="aurora-container" />;
 }

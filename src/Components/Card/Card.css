@@ -46,7 +46,7 @@
 
 .custom-card {
     background: rgba(255, 255, 255, 0.06) !important;
-    backdrop-filter: blur(10px) !important;
+    /* backdrop-filter: blur(10px) !important; */
     border-radius: 16px !important;
     box-shadow: 0 0 25px rgba(255, 255, 255, 0.06) !important;
     border: 1px solid rgba(255, 255, 255, 0.04) !important;
