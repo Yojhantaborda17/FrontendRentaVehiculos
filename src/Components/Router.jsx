@@ -6,6 +6,7 @@ import Alquileres from '../Pages/Alquileres';
 import Clientes from '../Pages/Clientes';
 import Vehiculos from '../Pages/Vehiculos';
 import Login from '../Pages/Login';
+import Registrarse from '../Pages/Registrarse';
 
 // components
 import ProtectedRoute from './ProtectedRoute';
@@ -16,13 +17,14 @@ const Router = () => {
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<Login />} />
-
+                <Route path="/register" element={<Registrarse />} />
                 <Route element={<ProtectedRoute />}>
                     <Route path="/dashboard" element={<Sidebar />}>
-                        <Route index element={<App/>}/>
+                        <Route index element={<App />} />
                         <Route path="alquileres" element={<Alquileres />} />
                         <Route path="clientes" element={<Clientes />} />
                         <Route path="vehiculos" element={<Vehiculos />} />
+
                     </Route>
                 </Route>
 

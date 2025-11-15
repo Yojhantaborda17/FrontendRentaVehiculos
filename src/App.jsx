@@ -4,11 +4,6 @@ import Sidebar from './Components/Sidebar'
 
 
 function App() {
-  // const menuItems = [
-  //   { label: 'Clientes', ariaLabel: 'Go to home page', link: '/' },
-  //   { label: 'Vehiculos', ariaLabel: 'Learn about us', link: '/vehiculos' },
-  //   { label: 'Alquileres', ariaLabel: 'View our services', link: '/alquileres' },
-  // ];
 
   return (
     <>

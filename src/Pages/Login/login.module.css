@@ -2,19 +2,21 @@
 
 
 .login-card-container {
-  /* limpia la mayoría de herencias */
-  /* all: unset; */
-  box-sizing: border-box; /* suele necesitarse */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+    /* limpia la mayoría de herencias */
+    /* all: unset; */
+    box-sizing: border-box;
+    /* suele necesitarse */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(to right, #3700ff, #0dc2aa);
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #3700ff, #0dc2aa);
 }
+
 .login-card-container * {
-  box-sizing: inherit;
+    box-sizing: inherit;
 }
 
 /* Login Card */
@@ -152,6 +154,30 @@
 .login-card button:hover {
     background-color: rgba(0, 0, 0, 0.85);
     cursor: pointer;
+}
+
+.login-card-footer {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.login-card-footer p {
+    color: #666;
+    font-size: 14px;
+}
+
+.register-link {
+    color: #007bff;
+    cursor: pointer;
+    margin-left: 5px;
+    font-weight: 500;
+    text-decoration: underline;
+}
+
+.register-link:hover {
+    color: #0056b3;
 }
 
 /* Responsive */

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
 
 export default function Login() {
-  
+
   let navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -15,7 +15,7 @@ export default function Login() {
       const response = await axios.post('http://localhost:8000/auth/login', {
         username: e.target.emailForm.value,
         password: e.target.passwordForm.value
-      }, { withCredentials: true});
+      }, { withCredentials: true });
 
       if (response.status === 200) {
         navigate('/dashboard')
@@ -29,10 +29,14 @@ export default function Login() {
     }
   }
 
+  const handleRegister = () => {
+    navigate('/register')
+  }
+
   useEffect(() => {
     axios.get("http://localhost:8000/auth/me", { withCredentials: true })
       .then(() => navigate("/dashboard"))
-      .catch(() => {});
+      .catch(() => { });
   }, [navigate]);
 
   return (
@@ -66,10 +70,20 @@ export default function Login() {
 
             <button type="submit">Iniciar sesión</button>
           </form>
+
+          {/* Sección de registro */}
+          <div className={styles['login-card-footer']}>
+            <p>¿No tienes una cuenta?
+              <span
+                onClick={handleRegister}
+                className={styles['register-link']}
+              >
+                Regístrate aquí
+              </span>
+            </p>
+          </div>
         </div>
       </div>
     </>
   )
 }
-
-
