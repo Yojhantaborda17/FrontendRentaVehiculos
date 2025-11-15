@@ -18,30 +18,22 @@ import { useEffect } from 'react';
 export default function Alquileres() {
     const [rentData, setRentData] = useState([]);
 
+    const [vehicles, setVehicles] = useState([]);
+    const [clients, setClients] = useState([]);
+
     const [showRentModal, setShowRentModal] = useState(false);
-    const [showEditRentModal, setShowEditRentModal] = useState(false);
+    const [showReturnRentModal, setShowReturnRentModal] = useState(false);
 
     const [formRent, setFormRent] = useState({
         cliente_id: "",
         vehiculo_id: "",
         fecha_inicio: "",
         fecha_fin: "",
-        dias_alquiler: 0,
-        precio_total: 0,
-        estado_id: 0,
-        fecha_devolucion_real: "",
         observaciones: ""
     });
 
-    const [formEditRent, setFormEditRent] = useState({
-        cliente_id: "",
-        vehiculo_id: "",
-        fecha_inicio: "",
-        fecha_fin: "",
-        dias_alquiler: 0,
-        precio_total: 0,
-        estado_id: 0,
-        fecha_devolucion_real: "",
+    const [formReturnRent, setFormReturnRent] = useState({
+        fecha_devolucion: "",
         observaciones: ""
     });
 
@@ -52,25 +44,40 @@ export default function Alquileres() {
 
     const loadRents = async () => {
         const result = await axios.get('http://localhost:8000/alquileres', { withCredentials: true })
+
         if (result.status === 200) {
             setRentData(result.data);
         }
     }
 
+    const fetchVehicles = async () => {
+        try {
+            const response = await axios.get('http://localhost:8000/vehiculos', { withCredentials: true }); 
+            setVehicles(response.data);
+        } catch (error) {
+            console.error('Error al cargar vehículos:', error);
+        }
+    };
+
+    const fetchClients = async () => {
+        try {
+            const response = await axios.get('http://localhost:8000/clientes', { withCredentials: true }); 
+            setClients(response.data);
+        } catch (error) {
+            console.error('Error al cargar clientes:', error);
+        }
+    };
     useEffect(() => {
+        fetchVehicles();
+        fetchClients();
         loadRents();
 
+        console.log(selectedRent);
+
         if (selectedRent) {
-            setFormEditRent({
+            setFormReturnRent({
                 id: selectedRent.id,
-                cliente_id: selectedRent.cliente_id,
-                vehiculo_id: selectedRent.vehiculo_id,
-                fecha_inicio: selectedRent.fecha_inicio,
-                fecha_fin: selectedRent.fecha_fin,
-                dias_alquiler: selectedRent.dias_alquiler,
-                precio_total: selectedRent.precio_total,
-                estado_id: selectedRent.estado_id,
-                fecha_devolucion_real: selectedRent.fecha_devolucion_real,
+                fecha_devolucion: selectedRent.fecha_devolucion_real,
                 observaciones: selectedRent.observaciones
             });
         }
@@ -98,11 +105,11 @@ export default function Alquileres() {
         }
     }
 
-    const handleEditRent = async () => {
+    const handleReturnRent = async () => {
         try {
-            await axios.put(`http://localhost:8000/alquileres/${selectedRent.id}`, formEditRent, { withCredentials: true });
+            await axios.put(`http://localhost:8000/alquileres/${selectedRent.id}/devolver`, formReturnRent, { withCredentials: true });
 
-            setShowEditRentModal(false);
+            setShowReturnRentModal(false);
             loadRents();
             swal.fire({
                 icon: 'success',
@@ -110,7 +117,7 @@ export default function Alquileres() {
             })
 
         } catch (err) {
-            setShowEditRentModal(false);
+            setShowReturnRentModal(false);
             swal.fire({
                 icon: 'error',
                 title: 'Error al editar el alquiler',
@@ -122,13 +129,13 @@ export default function Alquileres() {
     const handleDeleteRent = async (rent) => {
         try {
             const result = await swal.fire({
-                title: '¿Eliminar alquiler?',
+                title: '¿Cancelar alquiler?',
                 text: "Esta acción no se puede deshacer.",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Sí, eliminar',
+                confirmButtonText: 'Sí, cancelar',
             })
 
             if (result.isConfirmed) {
@@ -145,7 +152,7 @@ export default function Alquileres() {
             swal.fire({
                 icon: 'error',
                 title: 'Error al eliminar el alquiler',
-                text: err.response ? err.response.data.message : 'Error inesperado!'
+                text: err.response ? err.response.data.detail : 'Error inesperado!'
             })
         }
     }
@@ -169,8 +176,8 @@ export default function Alquileres() {
             header: 'Precio Total',
         },
         {
-            accessorKey: 'estado_id',
-            header: 'Estado ID',
+            accessorKey: 'estado_nombre',
+            header: 'Estado',
         },
         {
             accessorKey: 'fecha_devolucion_real',
@@ -179,19 +186,27 @@ export default function Alquileres() {
         {
             accessorKey: 'observaciones',
             header: 'Observaciones',
+            cell: ({ getValue }) => {
+                const value = getValue();
+                return (
+                    <div className="producto-descripcion">
+                        {value.length > 50 ? value.substring(0, 30) + '...' : value}
+                    </div>
+                )
+            }
         },
         {
             id: 'acciones',
             header: 'Acciones',
             cell: ({ row }) => (
                 <div className="d-flex gap-2 justify-content-center">
-                    <button className="btn-action btn-edit" title="Editar" onClick={() => {
+                    <button className="btn-action btn-edit" title="Devolver vehículo" onClick={() => {
                         setSelectedRent(row.original);
-                        setShowEditRentModal(true);
+                        setShowReturnRentModal(true);
                     }}>
-                        <i className="bi bi-pencil"></i>
+                        <i className="bi bi-arrow-left-right"></i>
                     </button>
-                    <button className="btn-action btn-delete" title="Eliminar" onClick={() => handleDeleteRent(row.original)}>
+                    <button className="btn-action btn-delete" title="Cancelar alquiler" onClick={() => handleDeleteRent(row.original)}>
                         <i className="bi bi-trash"></i>
                     </button>
                 </div>
@@ -245,7 +260,6 @@ export default function Alquileres() {
 
             {/* tabla */}
             <Container fluid className="py-4">
-
                 <Row>
                     <Col>
                         <Card className="table-card-dark">
@@ -307,55 +321,61 @@ export default function Alquileres() {
                                             <Form.Label className="form-label-dark">Fecha Inicio *</Form.Label>
                                             <Form.Control
                                                 type="date"
-                                                className="form-control-dark"
+                                                value={formRent.fecha_inicio}
                                                 onChange={(e) => setFormRent({ ...formRent, fecha_inicio: e.target.value })}
+                                                className="form-control-dark"
                                             />
 
                                             <Form.Label className="form-label-dark">Fecha Fin *</Form.Label>
                                             <Form.Control
+                                                required
                                                 type="date"
-                                                className="form-control-dark"
+                                                value={formRent.fecha_fin}
                                                 onChange={(e) => setFormRent({ ...formRent, fecha_fin: e.target.value })}
-                                            />
-
-                                            <Form.Label className="form-label-dark">Dias alquiler *</Form.Label>
-                                            <Form.Control
-                                                type="number"
                                                 className="form-control-dark"
-                                                onChange={(e) => setFormRent({ ...formRent, dias_alquiler: Number(e.target.value) })}
                                             />
 
-                                            <Form.Label className="form-label-dark">Precio Total *</Form.Label>
-                                            <Form.Control
-                                                type="number"
-                                                className="form-control-dark"
-                                                onChange={(e) => setFormRent({ ...formRent, precio_total: Number(e.target.value) })}
-                                            />
-
-                                            <Form.Label className="form-label-dark">Estado *</Form.Label>
+                                            <Form.Label className="form-label-dark">Vehículo *</Form.Label>
                                             <Form.Select
                                                 className="form-control-dark"
+                                                value={formRent.vehiculo_id || ''}
                                                 onChange={(e) =>
-                                                    setFormRent({ ...formRent, estado_id: Number(e.target.value) })
+                                                    setFormRent({ ...formRent, vehiculo_id: e.target.value })
                                                 }
+                                                required
                                             >
-                                                <option value="">Seleccione un estado</option>
-                                                <option value={1}>ACTIVO</option>
-                                                <option value={2}>COMPLETADO</option>
-                                                <option value={3}>CANCELADO</option>
+                                                <option value="">Seleccione un vehículo</option>
+                                                {vehicles.map((vehicle) => (
+                                                    <option key={vehicle.id} value={vehicle.id}>
+                                                        {vehicle.marca} {vehicle.modelo} - {vehicle.placa} (${vehicle.precio_por_dia}/día)
+                                                    </option>
+                                                ))}
                                             </Form.Select>
-                                            <Form.Label className="form-label-dark">Fecha devolución real</Form.Label>
-                                            <Form.Control
-                                                type="date"
+
+                                            <Form.Label className="form-label-dark">Cliente *</Form.Label>
+                                            <Form.Select
                                                 className="form-control-dark"
-                                                onChange={(e) => setFormRent({ ...formRent, fecha_devolucion_real: e.target.value })}
-                                            />
+                                                value={formRent.cliente_id || ''}
+                                                onChange={(e) =>
+                                                    setFormRent({ ...formRent, cliente_id: e.target.value })
+                                                }
+                                                required
+                                            >
+                                                <option value="">Seleccione un cliente</option>
+                                                {clients.map((client) => (
+                                                    <option key={client.id} value={client.id}>
+                                                        {client.nombre} {client.apellido} - {client.documento}
+                                                    </option>
+                                                ))}
+                                            </Form.Select>
 
                                             <Form.Label className="form-label-dark">Observaciones</Form.Label>
                                             <Form.Control
+                                                required
                                                 type="text"
-                                                className="form-control-dark"
+                                                value={formRent.observaciones}
                                                 onChange={(e) => setFormRent({ ...formRent, observaciones: e.target.value })}
+                                                className="form-control-dark"
                                             />
 
                                         </Form.Group>
@@ -366,93 +386,33 @@ export default function Alquileres() {
                                     </Modal.Footer>
                                 </Modal>
 
-                                {/* modal editar */}
-                                <Modal show={showEditRentModal} size='md' centered onHide={() => setShowEditRentModal(false)} className="modal-dark">
+                                {/* modal devolver */}
+                                <Modal show={showReturnRentModal} size='md' centered onHide={() => setShowReturnRentModal(false)} className="modal-dark">
                                     <Modal.Header closeButton>
-                                        <Modal.Title>Editar Alquiler</Modal.Title>
+                                        <Modal.Title>Devolver vehículo</Modal.Title>
                                     </Modal.Header>
                                     <Modal.Body>
                                         <Form.Group>
-                                            <Form.Label className="form-label-dark">Fecha Inicio *</Form.Label>
+                                            <Form.Label className="form-label-dark">Fecha devuelta *</Form.Label>
                                             <Form.Control
                                                 type="date"
-                                                value={formEditRent.fecha_inicio}
-                                                onChange={(e) => setFormEditRent({ ...formEditRent, fecha_inicio: e.target.value })}
-                                                className="form-control-dark"
-                                            />
-
-                                            <Form.Label className="form-label-dark">Fecha Fin *</Form.Label>
-                                            <Form.Control
-                                                type="date"
-                                                value={formEditRent.fecha_fin}
-                                                onChange={(e) => setFormEditRent({ ...formEditRent, fecha_fin: e.target.value })}
-                                                className="form-control-dark"
-                                            />
-
-                                            <Form.Label className="form-label-dark">Dias alquiler *</Form.Label>
-                                            <Form.Control
-                                                type="number"
-                                                value={formEditRent.dias_alquiler}
-                                                onChange={(e) => setFormEditRent({ ...formEditRent, dias_alquiler: Number(e.target.value) })}
-                                                className="form-control-dark"
-                                            />
-
-                                            <Form.Label className="form-label-dark">Precio Total *</Form.Label>
-                                            <Form.Control
-                                                type="number"
-                                                value={formEditRent.precio_total}
-                                                onChange={(e) => setFormEditRent({ ...formEditRent, precio_total: Number(e.target.value) })}
-                                                className="form-control-dark"
-                                            />
-
-                                            <Form.Label className="form-label-dark">Estado *</Form.Label>
-                                            <Form.Select
-                                                className="form-control-dark"
-                                                onChange={(e) =>
-                                                    setFormRent({ ...formRent, estado_id: Number(e.target.value) })
-                                                }
-                                            >
-                                                <option value="">Seleccione un estado</option>
-                                                <option value={1}>ACTIVO</option>
-                                                <option value={2}>COMPLETADO</option>
-                                                <option value={3}>CANCELADO</option>
-                                            </Form.Select>
-                                            <Form.Label className="form-label-dark">Fecha devolución real</Form.Label>
-                                            <Form.Control
-                                                type="date"
-                                                className="form-control-dark"
-                                                onChange={(e) => setFormRent({ ...formRent, fecha_devolucion_real: e.target.value })}
-                                            />
-
-                                            <Form.Label className="form-label-dark">Observaciones</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                className="form-control-dark"
-                                                onChange={(e) => setFormRent({ ...formRent, observaciones: e.target.value })}
-                                            />
-
-
-                                            <Form.Label className="form-label-dark">Fecha devolución real</Form.Label>
-                                            <Form.Control
-                                                type="date"
-                                                value={formEditRent.fecha_devolucion_real}
-                                                onChange={(e) => setFormEditRent({ ...formEditRent, fecha_devolucion_real: e.target.value })}
+                                                onChange={(e) => setFormReturnRent({ ...formReturnRent, fecha_devolucion: e.target.value })}
                                                 className="form-control-dark"
                                             />
 
                                             <Form.Label className="form-label-dark">Observaciones</Form.Label>
                                             <Form.Control
                                                 type="text"
-                                                value={formEditRent.observaciones}
-                                                onChange={(e) => setFormEditRent({ ...formEditRent, observaciones: e.target.value })}
+                                                value={formReturnRent.observaciones}
+                                                onChange={(e) => setFormReturnRent({ ...formReturnRent, observaciones: e.target.value })}
                                                 className="form-control-dark"
                                             />
 
                                         </Form.Group>
                                     </Modal.Body>
                                     <Modal.Footer>
-                                        <Button variant="secondary" onClick={() => setShowEditRentModal(false)}>Cancelar</Button>
-                                        <Button variant="primary" onClick={handleEditRent}>Guardar Cambios</Button>
+                                        <Button variant="secondary" onClick={() => setShowReturnRentModal(false)}>Cancelar</Button>
+                                        <Button variant="primary" onClick={handleReturnRent}>Guardar Cambios</Button>
                                     </Modal.Footer>
                                 </Modal>
 

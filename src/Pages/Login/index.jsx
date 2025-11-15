@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import styles from './login.module.css'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import Swal from 'sweetalert2'
 
 export default function Login() {
   
@@ -10,15 +11,22 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const response = await axios.post('http://localhost:8000/auth/login', {
-      username: e.target.emailForm.value,
-      password: e.target.passwordForm.value
-    }, { withCredentials: true});
+    try {
+      const response = await axios.post('http://localhost:8000/auth/login', {
+        username: e.target.emailForm.value,
+        password: e.target.passwordForm.value
+      }, { withCredentials: true});
 
-    if (response.status === 200) {
-      navigate('/dashboard')
+      if (response.status === 200) {
+        navigate('/dashboard')
+      }
+    } catch (err) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al iniciar sesión',
+        text: err.response.data.detail || 'Error inesperado.'
+      })
     }
-    console.log(response);
   }
 
   useEffect(() => {

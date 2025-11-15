@@ -1,14 +1,22 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import './sidebar.css';
+import axios from 'axios';
+
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleLogout = () => {
-    // Aquí puedes agregar la lógica de logout
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+       await axios.post('http://localhost:8000/auth/logout', {}, { withCredentials: true });
+       navigate('/');
+    }
+    catch (error) {
+      console.error('Error during logout:', error);
+    }
+    
   };
 
   const toggleSidebar = () => {
