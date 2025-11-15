@@ -16,7 +16,7 @@ import {
 import { useEffect } from 'react';
 
 
-export default function Vehiculos() {
+export default function Clientes() {
     const [carsData, setCarsData] = useState([]);
 
     const [showCarsModal, setShowCarsModal] = useState(false);
@@ -446,7 +446,7 @@ export default function Vehiculos() {
                                     <Modal.Header closeButton>
                                         <Modal.Title>
                                             <i className="bi bi-person-add me-2"></i>
-                                            Nuevo vehículo
+                                            Nuevo Cliente
                                         </Modal.Title>
                                     </Modal.Header>
                                     <Modal.Body>
@@ -504,7 +504,7 @@ export default function Vehiculos() {
                                     <Modal.Header closeButton>
                                         <Modal.Title>
                                             <i className="bi bi-person-gear me-2"></i>
-                                            Editar vehículo
+                                            Editar cliente
                                         </Modal.Title>
                                     </Modal.Header>
                                     <Modal.Body>
@@ -557,7 +557,7 @@ export default function Vehiculos() {
                                         </Button>
                                         <Button variant="primary" onClick={handleEditCar} className="btn-save-dark">
                                             <i className="bi bi-check-lg me-2"></i>
-                                            Editar vehículo
+                                            Editar cliente
                                         </Button>
                                     </Modal.Footer>
                                 </Modal>
